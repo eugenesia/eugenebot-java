@@ -8,22 +8,22 @@ import time
 import cleverbotfree.cbfree
 
 def close_browser():
-  print("Closing browser")
+  print("Closing browser", flush=True)
   cb.browser.close()
 
 def chat(msg):
   try:
-    print("Getting browser form")
+    print("Getting browser form", flush=True)
     cb.get_form()
   except:
     sys.exit()
-  print("Sending message %s" % msg)
+  print("Sending message %s" % msg, flush=True)
   cb.send_input(msg)
   return cb.get_response()
 
 cb = cleverbotfree.cbfree.Cleverbot()
 try:
-  print("Fetching URL on browser")
+  print("Fetching URL on browser", flush=True)
   cb.browser.get(cb.url)
 except:
   close_browser()
