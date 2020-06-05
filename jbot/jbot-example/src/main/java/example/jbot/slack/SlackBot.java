@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 
 /**
@@ -77,8 +76,12 @@ public class SlackBot extends Bot {
             out.println(messageText);
             out.flush();
 
+            // Read three lines (there doesn't seem to be a way to determine end of content)
+            String lines = in.readLine() + in.readLine() + in.readLine();
+            System.out.println("Lines " + lines);
+
             // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
-            reply(session, event, in.readLine());
+            reply(session, event, lines);
         }
     }
 
