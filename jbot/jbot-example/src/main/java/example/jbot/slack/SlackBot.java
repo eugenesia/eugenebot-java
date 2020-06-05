@@ -88,6 +88,7 @@ public class SlackBot extends Bot {
           System.out.println("Timed out with line " + line);
         }
 
+        System.out.println("Replying with line " + line);
         // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
         reply(session, event, line);
       }
