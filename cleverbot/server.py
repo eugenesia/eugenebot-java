@@ -33,12 +33,12 @@ while True:
 
       if data:
         trimmed_data = remove_non_words(data.decode('utf-8'))
-        resp = chat(trimmed_data)
-        resp_bytes = resp.encode()
+        resp = chat(trimmed_data) + "\n"
+        resp_bytes = resp.encode('utf-8')
         print('sending response back to the client %s' % resp, file=sys.stderr)
         connection.sendall(resp_bytes)
       else:
-        print('no more data from ' + client_address, file=sys.stderr)
+        print('no more data from ' + client_address[0], file=sys.stderr)
         break
 
   finally:
