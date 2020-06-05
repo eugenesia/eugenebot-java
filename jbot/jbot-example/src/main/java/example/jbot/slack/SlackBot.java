@@ -19,6 +19,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.regex.Matcher;
 
 /**
@@ -64,25 +65,32 @@ public class SlackBot extends Bot {
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) throws IOException {
       System.out.println(event.getText());
-        try (Socket socket = new Socket("localhost", 10000)) {
-            InputStream input = socket.getInputStream();
-            BufferedReader in = new BufferedReader(new InputStreamReader(input));
+      try (Socket socket = new Socket("localhost", 10000)) {
+        socket.setSoTimeout(10000);
+        InputStream input = socket.getInputStream();
+        BufferedReader in = new BufferedReader(new InputStreamReader(input));
 
-            OutputStream output = socket.getOutputStream();
-            PrintWriter out = new PrintWriter(new OutputStreamWriter(output));
+        OutputStream output = socket.getOutputStream();
+        PrintWriter out = new PrintWriter(new OutputStreamWriter(output));
 
-            String messageText = event.getText().replaceAll("\\<.*?\\>", "");
-            System.out.println("messageText " + messageText);
-            out.println(messageText);
-            out.flush();
+        String messageText = event.getText().replaceAll("\\<.*?\\>", "");
+        System.out.println("messageText " + messageText);
+        out.println(messageText);
+        out.flush();
 
-            // Read three lines (there doesn't seem to be a way to determine end of content)
-            String lines = in.readLine() + in.readLine() + in.readLine();
-            System.out.println("Lines " + lines);
-
-            // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
-            reply(session, event, lines);
+        String line = null;
+        try {
+          // Read only one line else it will block and wait forever for a new line
+          line = in.readLine();
+          System.out.println("Line " + line);
         }
+        catch (SocketTimeoutException ex) {
+          System.out.println("Timed out with line " + line);
+        }
+
+        // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
+        reply(session, event, line);
+      }
     }
 
     /**
