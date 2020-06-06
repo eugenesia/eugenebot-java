@@ -65,6 +65,8 @@ public class SlackBot extends Bot {
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) throws IOException {
       System.out.println(event.getText());
+      BufferedReader in = null;
+      PrintWriter out = null;
       try (Socket socket = new Socket("localhost", 10000)) {
         socket.setSoTimeout(10000);
         InputStream input = socket.getInputStream();
@@ -91,6 +93,10 @@ public class SlackBot extends Bot {
         System.out.println("Replying with line " + line);
         // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
         reply(session, event, line);
+      }
+      finally {
+        in.close();
+        out.close();
       }
     }
 
