@@ -95,8 +95,12 @@ public class SlackBot extends Bot {
         reply(session, event, line);
       }
       finally {
-        in.close();
-        out.close();
+        if (in != null) {
+          in.close();
+        }
+        if (out != null) {
+          out.close();
+        }
       }
     }
 
