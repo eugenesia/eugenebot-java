@@ -70,10 +70,10 @@ public class SlackBot extends Bot {
       try (Socket socket = new Socket("localhost", 10000)) {
         socket.setSoTimeout(10000);
         InputStream input = socket.getInputStream();
-        BufferedReader in = new BufferedReader(new InputStreamReader(input));
+        in = new BufferedReader(new InputStreamReader(input));
 
         OutputStream output = socket.getOutputStream();
-        PrintWriter out = new PrintWriter(new OutputStreamWriter(output));
+        out = new PrintWriter(new OutputStreamWriter(output));
 
         String messageText = event.getText().replaceAll("\\<.*?\\>", "");
         System.out.println("messageText " + messageText);
