@@ -18,8 +18,6 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -30,6 +28,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /**
  * Base class for making Slack Bots. Any class extending
@@ -175,6 +176,7 @@ public abstract class Bot extends BaseBot {
             if (reply.getChannel() == null && event.getChannelId() != null) {
                 reply.setChannel(event.getChannelId());
             }
+            logger.debug("Doing sendMessageLock");
             synchronized (sendMessageLock) {
                 session.sendMessage(new TextMessage(reply.toJSONString()));
             }
