@@ -1,6 +1,10 @@
+"""
+Run the main server socket for the Cleverbot server.
+"""
+
 import socket
 import sys
-from cbot_browser import chat
+from cbot_session import chat
 
 CHUNK_SIZE = 16
 CONNECTIONS_COUNT = 5
@@ -15,22 +19,24 @@ def receive_message(connection):
   data = b'' # Initialise byte string
   while True:
     try:
-      # Receive the data in small chunks
+      # Wait to receive the data in small chunks
+      # NOTE: If no more data, it will wait forever until new data shows up
       chunk = connection.recv(CHUNK_SIZE)
     except Exception as e:
-      print(e, file=sys.stderr, flush=True)
+      print(f"Error on receiving data: {e}", file=sys.stderr, flush=True)
       break
 
-    print(f"Received '{chunk}'", file=sys.stderr, flush=True)
+    print(f"Received '{chunk}'", flush=True)
     if chunk:
       data += chunk
       # A message usually ends in a newline
       # If received chunk is less than max size, we've reached the end of message
       if len(chunk) < CHUNK_SIZE and b'\n' in chunk:
-        print(f"End of message. Chunk size {len(chunk)}", file=sys.stderr, flush=True)
+        print(f"End of message. Chunk size {len(chunk)}", flush=True)
         break
     else:
-      print("No more chunks", file=sys.stderr, flush=True)
+      # Empty chunk seems to be a control message
+      print("Empty chunk received", flush=True)
       break
   
   message = data.decode(errors='ignore')
@@ -57,22 +63,27 @@ if __name__ == '__main__':
   # Loop to handle new connections
   while True:
     # Wait for a connection
-    print("Waiting for a connection", file=sys.stderr, flush=True)
+    print("Waiting for a connection", flush=True)
     connection, client_address = sock.accept()
-    print(f"Connection from {client_address[0]}:{client_address[1]}", file=sys.stderr, flush=True)
+    print(f"Connection from {client_address[0]}:{client_address[1]}", flush=True)
 
     try:
       # Loop with the same connection to handle multiple incoming messages
       while True:
         message = receive_message(connection)
+
+        # Empty message - seems to be a control message e.g. connection close
+        if not len(message):
+          break # Wait for next message
+
         message = remove_non_words(message) # Remove <SOME-SLACK-ID> which Cleverbot doesn't need
 
-        print(f"Sending message '{message}' to Cleverbot", file=sys.stderr, flush=True)
+        print(f"Sending message to Cleverbot: '{message}'", flush=True)
         resp = chat(message) + "\n"
         resp_bytes = resp.encode()
 
         try:
-          print(f"Sending response back to the client: '{resp}'", file=sys.stderr, flush=True)
+          print(f"Sending response back to client: '{resp}'", flush=True)
           connection.sendall(resp_bytes)
         except Exception as e:
           print(f"Error on sending response back to client: {e}", file=sys.stderr, flush=True)
