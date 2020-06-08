@@ -77,22 +77,23 @@ public class SlackBot extends Bot {
         socket.setSoTimeout(CBOT_SOCKET_TIMEOUT);
 
         String messageText = event.getText().replaceAll("\\<.*?\\>", "");
-        System.out.println("messageText from Slack: " + messageText);
+        logger.debug("Message text from Slack: {}", messageText);
         out.println(messageText);
         out.flush();
 
         String line = null;
         try {
-          System.out.println("Reading new line");
+          logger.debug("Reading new line");
           // Read only one line else it will block and wait forever for a new line
           line = in.readLine();
-          System.out.println("Line " + line);
+          logger.debug("Read line: {}", line);
         }
         catch (SocketTimeoutException ex) {
           System.out.println("Timed out with line " + line);
+          logger.debug("Timed out with line: {}", line);
         }
 
-        System.out.println("Replying with line " + line);
+        logger.debug("Replying with line: {}", line);
         // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
         reply(session, event, line);
       }
