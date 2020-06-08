@@ -168,7 +168,7 @@ public abstract class Bot extends BaseBot {
      * @param reply   the message to send to slack
      */
     protected final void reply(WebSocketSession session, Event event, Message reply) {
-        logger.debug("in Bot::reply");
+        logger.debug("in Bot::reply - 2");
         try {
             if (StringUtils.isEmpty(reply.getType())) {
                 reply.setType(EventType.MESSAGE.name().toLowerCase());
@@ -190,6 +190,7 @@ public abstract class Bot extends BaseBot {
     }
 
     protected final void reply(WebSocketSession session, Event event, String text) {
+        logger.debug("in Bot::reply - 1");
         reply(session, event, new Message(text));
     }
 
