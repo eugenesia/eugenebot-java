@@ -5,6 +5,7 @@ import me.ramswaroop.jbot.core.common.EventType;
 import me.ramswaroop.jbot.core.common.JBot;
 import me.ramswaroop.jbot.core.slack.Bot;
 import me.ramswaroop.jbot.core.slack.models.Event;
+import me.ramswaroop.jbot.core.slack.models.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,12 +74,16 @@ public class SlackBot extends Bot {
            OutputStream output = socket.getOutputStream();
            PrintWriter out = new PrintWriter(new OutputStreamWriter(output));
       ) {
-        socket.setSoTimeout(CBOT_SOCKET_TIMEOUT);
+        socket.setSoTimeout(CBOT_SOCKET_TIMEOUT); // Don't wait forever for Cleverbot reply
 
         String messageText = event.getText().replaceAll("\\<.*?\\>", "");
-        logger.debug("Message text from Slack: {}", messageText);
+
+        // Send message to Cleverbot
+        logger.debug("Sending Slack message to Cleverbot: {}", messageText);
         out.println(messageText);
         out.flush();
+
+        replyBotTyping(session, event);
 
         String line = null;
         try {
@@ -201,4 +206,17 @@ public class SlackBot extends Bot {
         }
         stopConversation(event);    // stop conversation
     }
+
+  /**
+   * Indicate that the bot is typing
+   * https://github.com/rampatra/jbot/issues/158
+   * NOTE: Slack Bot needs to use RTM API (not just Events API) to set user_typing
+   * @param session Web socket session with Slack
+   * @param event Event to reply to
+   */
+  private void replyBotTyping(WebSocketSession session, Event event) {
+    Message m = new Message();
+    m.setType(EventType.USER_TYPING.name().toLowerCase());
+    reply(session, event, m);
+  }
 }
