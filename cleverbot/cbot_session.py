@@ -1,5 +1,6 @@
 """
-Cleverbot chat function - keep browser open as a global object.
+Cleverbot chat function - keep browser open as a global object to maintain the
+session.
 """
 
 import sys
@@ -9,7 +10,13 @@ import cleverbotfree.cbfree
 
 def close_browser():
   print("Closing browser", flush=True)
-  cb.browser.close()
+
+  try:
+    # Update: Seems like we don't need it as this causes it to reopen another
+    # session and fail with 'Connection refused'
+    cb.browser.close()
+  except Exception as e:
+    print(f"Error on browser close: {e}")
 
 def chat(msg):
   try:
