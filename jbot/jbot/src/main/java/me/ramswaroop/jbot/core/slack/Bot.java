@@ -173,6 +173,7 @@ public abstract class Bot extends BaseBot {
                 reply.setType(EventType.MESSAGE.name().toLowerCase());
             }
             reply.setText(encode(reply.getText()));
+	    logger.debug("Setting channel");
             if (reply.getChannel() == null && event.getChannelId() != null) {
                 reply.setChannel(event.getChannelId());
             }
