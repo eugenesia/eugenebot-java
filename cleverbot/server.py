@@ -74,6 +74,7 @@ if __name__ == '__main__':
 
         # Empty message - seems to be EOF i.e. connection close
         if not len(message):
+          print("Empty message - assuming EOF / connection close", flush=True)
           break # Wait for next connection
 
         message = remove_non_words(message) # Remove <SOME-SLACK-ID> which Cleverbot doesn't need
