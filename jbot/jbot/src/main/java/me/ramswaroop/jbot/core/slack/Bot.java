@@ -349,7 +349,7 @@ public abstract class Bot extends BaseBot {
             pingScheduledExecutorService.shutdownNow();
         }
         pingScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        pingScheduledExecutorService.scheduleAtFixedRate(pingTask, 1L, 30L, TimeUnit.SECONDS);
+        pingScheduledExecutorService.scheduleAtFixedRate(pingTask, 30L, 30L, TimeUnit.SECONDS);
     }
 
     class PingTask implements Runnable {
