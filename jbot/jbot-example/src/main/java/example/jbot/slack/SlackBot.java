@@ -37,6 +37,7 @@ public class SlackBot extends Bot {
   private static final int CBOT_SOCKET_TIMEOUT = 15000;
   private static final String CBOT_HOST = "localhost";
   private static final int CBOT_PORT = 10000;
+  private static Socket cbotSocket;
 
   private static final Logger logger = LoggerFactory.getLogger(SlackBot.class);
 
@@ -46,6 +47,22 @@ public class SlackBot extends Bot {
      */
     @Value("${slackBotToken}")
     private String slackToken;
+
+    public SlackBot() throws IOException {
+      super();
+      cbotSocket = new Socket(CBOT_HOST, CBOT_PORT);
+      cbotSocket.setSoTimeout(CBOT_SOCKET_TIMEOUT); // Don't wait forever for Cleverbot reply
+
+    }
+
+    @Override public void destroy() {
+      super.destroy();
+      try {
+        cbotSocket.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
 
     @Override
     public String getSlackToken() {
@@ -68,22 +85,20 @@ public class SlackBot extends Bot {
      */
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) throws IOException {
-      try (Socket socket = new Socket(CBOT_HOST, CBOT_PORT);
-           InputStream input = socket.getInputStream();
+      try (InputStream input = cbotSocket.getInputStream();
            BufferedReader in = new BufferedReader(new InputStreamReader(input));
-           OutputStream output = socket.getOutputStream();
+           OutputStream output = cbotSocket.getOutputStream();
            PrintWriter out = new PrintWriter(new OutputStreamWriter(output));
       ) {
-        socket.setSoTimeout(CBOT_SOCKET_TIMEOUT); // Don't wait forever for Cleverbot reply
-
         String messageText = event.getText().replaceAll("\\<.*?\\>", "");
 
         // Send message to Cleverbot
         logger.debug("Sending Slack message to Cleverbot: {}", messageText);
         out.println(messageText);
+        logger.debug("Flushing out");
         out.flush();
 
-        replyBotTyping(session, event);
+        // replyBotTyping(session, event);
 
         String line = null;
         try {
