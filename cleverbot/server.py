@@ -30,8 +30,7 @@ def receive_message(connection):
     if chunk:
       data += chunk
       # A message usually ends in a newline
-      # If received chunk is less than max size, we've reached the end of message
-      if len(chunk) < CHUNK_SIZE and b'\n' in chunk:
+      if chunk.endswith(b'\n'):
         print(f"End of message. Chunk size {len(chunk)}", flush=True)
         break
     else:
