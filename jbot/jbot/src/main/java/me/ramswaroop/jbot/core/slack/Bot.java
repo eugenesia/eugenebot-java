@@ -366,7 +366,7 @@ public abstract class Bot extends BaseBot {
                 logger.debug("Pinging Slack...");
                 Message message = new Message();
                 message.setType(EventType.PING.name().toLowerCase());
-                // message.setId((new Random()).nextInt());
+                message.setId(1);
                 synchronized (sendMessageLock) {
                     logger.debug("In Bot::run - sendMessageLock");
                     new ConcurrentWebSocketSessionDecorator(webSocketSession, 5000, 256)
