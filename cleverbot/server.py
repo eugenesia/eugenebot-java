@@ -72,9 +72,9 @@ if __name__ == '__main__':
       while True:
         message = receive_message(connection)
 
-        # Empty message - seems to be a control message e.g. connection close
+        # Empty message - seems to be EOF i.e. connection close
         if not len(message):
-          break # Wait for next message
+          break # Wait for next connection
 
         message = remove_non_words(message) # Remove <SOME-SLACK-ID> which Cleverbot doesn't need
 
