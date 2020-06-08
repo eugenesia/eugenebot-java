@@ -364,11 +364,13 @@ public abstract class Bot extends BaseBot {
                 logger.debug("Pinging Slack...");
                 Message message = new Message();
                 message.setType(EventType.PING.name().toLowerCase());
+                /*
                 synchronized (sendMessageLock) {
                     logger.debug("In Bot::run - sendMessageLock");
                     webSocketSession.sendMessage(new TextMessage(message.toJSONString()));
                 }
                 logger.debug("Out of Bot::run - sendMessageLock");
+                */
             } catch (Exception e) {
                 logger.error("Error pinging Slack. Slack bot may go offline when not active. Exception: ", e);
                 if (!isWebSocketSessionOpen()) {
