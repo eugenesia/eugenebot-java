@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -364,7 +365,7 @@ public abstract class Bot extends BaseBot {
                 logger.debug("Pinging Slack...");
                 Message message = new Message();
                 message.setType(EventType.PING.name().toLowerCase());
-                message.setId(1);
+                message.setId((new Random()).nextInt());
                 synchronized (sendMessageLock) {
                     logger.debug("In Bot::run - sendMessageLock");
                     webSocketSession.sendMessage(new TextMessage(message.toJSONString()));
