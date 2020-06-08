@@ -180,8 +180,10 @@ public abstract class Bot extends BaseBot {
             }
             logger.debug("Doing synchronized sendMessageLock");
             synchronized (sendMessageLock) {
+                logger.debug("In Bot::reply - sendMessageLock");
                 session.sendMessage(new TextMessage(reply.toJSONString()));
             }
+            logger.debug("Out of Bot::reply - sendMessageLock");
             if (logger.isDebugEnabled()) {  // For debugging purpose only
                 logger.debug("Reply (Message): {}", reply.toJSONString());
             }
@@ -363,8 +365,10 @@ public abstract class Bot extends BaseBot {
                 Message message = new Message();
                 message.setType(EventType.PING.name().toLowerCase());
                 synchronized (sendMessageLock) {
+                    logger.debug("In Bot::run - sendMessageLock");
                     webSocketSession.sendMessage(new TextMessage(message.toJSONString()));
                 }
+                logger.debug("Out of Bot::run - sendMessageLock");
             } catch (Exception e) {
                 logger.error("Error pinging Slack. Slack bot may go offline when not active. Exception: ", e);
                 if (!isWebSocketSessionOpen()) {
