@@ -67,7 +67,6 @@ public class SlackBot extends Bot {
      */
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) throws IOException {
-      System.out.println(event.getText());
       try (Socket socket = new Socket(CBOT_HOST, CBOT_PORT);
            InputStream input = socket.getInputStream();
            BufferedReader in = new BufferedReader(new InputStreamReader(input));
