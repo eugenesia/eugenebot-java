@@ -17,6 +17,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.WebSocketConnectionManager;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.handler.ConcurrentWebSocketSessionDecorator;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -367,7 +368,8 @@ public abstract class Bot extends BaseBot {
                 // message.setId((new Random()).nextInt());
                 synchronized (sendMessageLock) {
                     logger.debug("In Bot::run - sendMessageLock");
-                    webSocketSession.sendMessage(new TextMessage(message.toJSONString()));
+                    new ConcurrentWebSocketSessionDecorator(webSocketSession, 10000, 256)
+                        .sendMessage(new TextMessage(message.toJSONString()));
                 }
                 logger.debug("Out of Bot::run - sendMessageLock");
             } catch (Exception e) {
