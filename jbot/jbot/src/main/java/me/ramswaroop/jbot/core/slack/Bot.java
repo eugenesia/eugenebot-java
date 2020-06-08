@@ -182,7 +182,8 @@ public abstract class Bot extends BaseBot {
             logger.debug("Doing synchronized sendMessageLock");
             synchronized (sendMessageLock) {
                 logger.debug("In Bot::reply - sendMessageLock");
-                session.sendMessage(new TextMessage(reply.toJSONString()));
+                new ConcurrentWebSocketSessionDecorator(session, 10000, 256)
+                    .sendMessage(new TextMessage(reply.toJSONString()));
             }
             logger.debug("Out of Bot::reply - sendMessageLock");
             if (logger.isDebugEnabled()) {  // For debugging purpose only
