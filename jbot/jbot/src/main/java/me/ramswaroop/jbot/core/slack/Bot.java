@@ -366,6 +366,7 @@ public abstract class Bot extends BaseBot {
                 Message message = new Message();
                 message.setType(EventType.PING.name().toLowerCase());
                 message.setId((new Random()).nextInt());
+                Thread.sleep(5000); // Wait for websocket to be ready
                 synchronized (sendMessageLock) {
                     logger.debug("In Bot::run - sendMessageLock");
                     webSocketSession.sendMessage(new TextMessage(message.toJSONString()));
