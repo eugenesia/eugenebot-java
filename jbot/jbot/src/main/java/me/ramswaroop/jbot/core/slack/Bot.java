@@ -174,10 +174,11 @@ public abstract class Bot extends BaseBot {
                 reply.setType(EventType.MESSAGE.name().toLowerCase());
             }
             reply.setText(encode(reply.getText()));
-	    logger.debug("Setting channel");
+            logger.debug("Setting channel");
             if (reply.getChannel() == null && event.getChannelId() != null) {
                 reply.setChannel(event.getChannelId());
             }
+            logger.debug("Doing synchronized sendMessageLock");
             synchronized (sendMessageLock) {
                 session.sendMessage(new TextMessage(reply.toJSONString()));
             }
