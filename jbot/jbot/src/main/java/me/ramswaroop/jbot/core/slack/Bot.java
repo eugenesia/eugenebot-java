@@ -176,7 +176,6 @@ public abstract class Bot extends BaseBot {
             if (reply.getChannel() == null && event.getChannelId() != null) {
                 reply.setChannel(event.getChannelId());
             }
-            logger.debug("Doing sendMessageLock");
             synchronized (sendMessageLock) {
                 session.sendMessage(new TextMessage(reply.toJSONString()));
             }
