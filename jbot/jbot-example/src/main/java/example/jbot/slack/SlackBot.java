@@ -33,8 +33,11 @@ import java.util.regex.Matcher;
 @JBot
 @Profile("slack")
 public class SlackBot extends Bot {
+  private static final int CBOT_SOCKET_TIMEOUT = 15000;
+  private static final String CBOT_HOST = "localhost";
+  private static final int CBOT_PORT = 10000;
 
-    private static final Logger logger = LoggerFactory.getLogger(SlackBot.class);
+  private static final Logger logger = LoggerFactory.getLogger(SlackBot.class);
 
     /**
      * Slack token from application.properties file. You can get your slack token
@@ -65,23 +68,22 @@ public class SlackBot extends Bot {
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) throws IOException {
       System.out.println(event.getText());
-      BufferedReader in = null;
-      PrintWriter out = null;
-      try (Socket socket = new Socket("localhost", 10000)) {
-        socket.setSoTimeout(10000);
-        InputStream input = socket.getInputStream();
-        in = new BufferedReader(new InputStreamReader(input));
-
-        OutputStream output = socket.getOutputStream();
-        out = new PrintWriter(new OutputStreamWriter(output));
+      try (Socket socket = new Socket(CBOT_HOST, CBOT_PORT);
+           InputStream input = socket.getInputStream();
+           BufferedReader in = new BufferedReader(new InputStreamReader(input));
+           OutputStream output = socket.getOutputStream();
+           PrintWriter out = new PrintWriter(new OutputStreamWriter(output));
+      ) {
+        socket.setSoTimeout(CBOT_SOCKET_TIMEOUT);
 
         String messageText = event.getText().replaceAll("\\<.*?\\>", "");
-        System.out.println("messageText " + messageText);
+        System.out.println("messageText from Slack: " + messageText);
         out.println(messageText);
         out.flush();
 
         String line = null;
         try {
+          System.out.println("Reading new line");
           // Read only one line else it will block and wait forever for a new line
           line = in.readLine();
           System.out.println("Line " + line);
@@ -93,14 +95,6 @@ public class SlackBot extends Bot {
         System.out.println("Replying with line " + line);
         // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
         reply(session, event, line);
-      }
-      finally {
-        if (in != null) {
-          in.close();
-        }
-        if (out != null) {
-          out.close();
-        }
       }
     }
 
