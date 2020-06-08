@@ -92,7 +92,7 @@ public class SlackBot extends Bot {
       logger.debug("Flushing out");
       cbotWriter.flush();
 
-      // replyBotTyping(session, event);
+      sendTyping(session, event);
 
       String line = null;
       try {
@@ -222,9 +222,9 @@ public class SlackBot extends Bot {
    * @param session Web socket session with Slack
    * @param event Event to reply to
    */
-  private void replyBotTyping(WebSocketSession session, Event event) {
+  private void sendTyping(WebSocketSession session, Event event) {
     Message m = new Message();
-    m.setType(EventType.USER_TYPING.name().toLowerCase());
+    m.setType("typing");
     reply(session, event, m);
   }
 
