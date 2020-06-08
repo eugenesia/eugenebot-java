@@ -16,7 +16,7 @@ def close_browser():
     # session and fail with 'Connection refused'
     cb.browser.close()
   except Exception as e:
-    print(f"Error on browser close: {e}")
+    print(f"Error on browser close: {e}", file=sys.stderr, flush=True)
 
 def chat(msg):
   try:
