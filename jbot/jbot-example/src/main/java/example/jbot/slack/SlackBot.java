@@ -38,6 +38,8 @@ public class SlackBot extends Bot {
   private static final String CBOT_HOST = "localhost";
   private static final int CBOT_PORT = 10000;
   private static Socket cbotSocket;
+  private static BufferedReader cbotReader;
+  private static PrintWriter cbotWriter;
 
   private static final Logger logger = LoggerFactory.getLogger(SlackBot.class);
 
@@ -53,6 +55,11 @@ public class SlackBot extends Bot {
       cbotSocket = new Socket(CBOT_HOST, CBOT_PORT);
       cbotSocket.setSoTimeout(CBOT_SOCKET_TIMEOUT); // Don't wait forever for Cleverbot reply
 
+      InputStream input = cbotSocket.getInputStream();
+      cbotReader = new BufferedReader(new InputStreamReader(input));
+
+      OutputStream output = cbotSocket.getOutputStream();
+      cbotWriter = new PrintWriter(new OutputStreamWriter(output));
     }
 
     @Override public void destroy() {
@@ -85,37 +92,31 @@ public class SlackBot extends Bot {
      */
     @Controller(events = {EventType.DIRECT_MENTION, EventType.DIRECT_MESSAGE})
     public void onReceiveDM(WebSocketSession session, Event event) throws IOException {
-      try (InputStream input = cbotSocket.getInputStream();
-           BufferedReader in = new BufferedReader(new InputStreamReader(input));
-           OutputStream output = cbotSocket.getOutputStream();
-           PrintWriter out = new PrintWriter(new OutputStreamWriter(output));
-      ) {
-        String messageText = event.getText().replaceAll("\\<.*?\\>", "");
+      String messageText = event.getText().replaceAll("\\<.*?\\>", "");
 
-        // Send message to Cleverbot
-        logger.debug("Sending Slack message to Cleverbot: {}", messageText);
-        out.println(messageText);
-        logger.debug("Flushing out");
-        out.flush();
+      // Send message to Cleverbot
+      logger.debug("Sending Slack message to Cleverbot: {}", messageText);
+      cbotWriter.println(messageText);
+      logger.debug("Flushing out");
+      cbotWriter.flush();
 
-        // replyBotTyping(session, event);
+      // replyBotTyping(session, event);
 
-        String line = null;
-        try {
-          logger.debug("Reading new line");
-          // Read only one line else it will block and wait forever for a new line
-          line = in.readLine();
-          logger.debug("Read line: {}", line);
-        }
-        catch (SocketTimeoutException ex) {
-          System.out.println("Timed out with line " + line);
-          logger.debug("Timed out with line: {}", line);
-        }
-
-        logger.debug("Replying with line: {}", line);
-        // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
-        reply(session, event, line);
+      String line = null;
+      try {
+        logger.debug("Reading new line");
+        // Read only one line else it will block and wait forever for a new line
+        line = cbotReader.readLine();
+        logger.debug("Read line: {}", line);
       }
+      catch (SocketTimeoutException ex) {
+        System.out.println("Timed out with line " + line);
+        logger.debug("Timed out with line: {}", line);
+      }
+
+      logger.debug("Replying with line: {}", line);
+      // reply(session, event, "Hi, I am " + slackService.getCurrentUser().getName());
+      reply(session, event, line);
     }
 
     /**
