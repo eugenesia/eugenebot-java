@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Queue;
-import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -348,7 +347,7 @@ public abstract class Bot extends BaseBot {
             pingScheduledExecutorService.shutdownNow();
         }
         pingScheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
-        pingScheduledExecutorService.scheduleAtFixedRate(pingTask, 1L, 30L, TimeUnit.SECONDS);
+        pingScheduledExecutorService.scheduleAtFixedRate(pingTask, 60L, 30L, TimeUnit.SECONDS);
     }
 
     class PingTask implements Runnable {
@@ -365,8 +364,7 @@ public abstract class Bot extends BaseBot {
                 logger.debug("Pinging Slack...");
                 Message message = new Message();
                 message.setType(EventType.PING.name().toLowerCase());
-                message.setId((new Random()).nextInt());
-                Thread.sleep(5000); // Wait for websocket to be ready
+                // message.setId((new Random()).nextInt());
                 synchronized (sendMessageLock) {
                     logger.debug("In Bot::run - sendMessageLock");
                     webSocketSession.sendMessage(new TextMessage(message.toJSONString()));
