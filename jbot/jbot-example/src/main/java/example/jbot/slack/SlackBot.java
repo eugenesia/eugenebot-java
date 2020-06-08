@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.regex.Matcher;
 
@@ -52,14 +53,7 @@ public class SlackBot extends Bot {
 
     public SlackBot() throws IOException {
       super();
-      cbotSocket = new Socket(CBOT_HOST, CBOT_PORT);
-      cbotSocket.setSoTimeout(CBOT_SOCKET_TIMEOUT); // Don't wait forever for Cleverbot reply
-
-      InputStream input = cbotSocket.getInputStream();
-      cbotReader = new BufferedReader(new InputStreamReader(input));
-
-      OutputStream output = cbotSocket.getOutputStream();
-      cbotWriter = new PrintWriter(new OutputStreamWriter(output));
+      connectCbot();
     }
 
     @Override public void destroy() {
@@ -234,5 +228,16 @@ public class SlackBot extends Bot {
     Message m = new Message();
     m.setType(EventType.USER_TYPING.name().toLowerCase());
     reply(session, event, m);
+  }
+
+  private void connectCbot() throws IOException {
+    cbotSocket = new Socket(CBOT_HOST, CBOT_PORT);
+    cbotSocket.setSoTimeout(CBOT_SOCKET_TIMEOUT); // Don't wait forever for Cleverbot reply
+
+    InputStream input = cbotSocket.getInputStream();
+    cbotReader = new BufferedReader(new InputStreamReader(input));
+
+    OutputStream output = cbotSocket.getOutputStream();
+    cbotWriter = new PrintWriter(new OutputStreamWriter(output));
   }
 }
