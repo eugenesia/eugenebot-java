@@ -20,9 +20,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.regex.Matcher;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 /**
  * A simple Slack Bot. You can create multiple bots by just
@@ -51,18 +53,14 @@ public class SlackBot extends Bot {
     @Value("${slackBotToken}")
     private String slackToken;
 
-    public SlackBot() throws IOException {
-      super();
+    @PostConstruct
+    private void setup() throws IOException {
       connectCbot();
     }
 
-    @Override public void destroy() {
-      super.destroy();
-      try {
-        cbotSocket.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
+    @PreDestroy
+    private void shutdown() throws IOException {
+      cbotSocket.close();
     }
 
     @Override
