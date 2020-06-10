@@ -29,7 +29,7 @@ function stripTags(txt) {
 
 async function chat(bot, message) {
     // Slack sends multiple messages per user action, don't handle them twice
-    const msgId = message.client_message_id;
+    const msgId = message.client_msg_id;
     if (isMessageProcessed(msgId)) {
         return;
     }
