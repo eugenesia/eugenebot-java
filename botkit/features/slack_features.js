@@ -23,6 +23,22 @@ function isMessageProcessed(msgId) {
     return false;
 }
 
+function stripTags(txt) {
+    return txt.replace(/(<([^>]+)>)/ig,"");
+}
+
+async function chat(bot, message) {
+    // Slack sends multiple messages per user action, don't handle them twice
+    const msgId = message.client_message_id;
+    if (isMessageProcessed(msgId)) {
+        return;
+    }
+    addMessageId(msgId);
+
+    const reply = await send(stripTags(message.text));
+    return await bot.reply(message, reply);
+}
+
 module.exports = function(controller) {
 
     controller.ready(async () => {
@@ -34,18 +50,7 @@ module.exports = function(controller) {
     });
 
     controller.on('direct_message', async(bot, message) => {
-
-        // Slack sends multiple messages per user action, don't handle them twice
-        const msgId = message.client_message_id;
-        if (isMessageProcessed(msgId)) {
-            return;
-        }
-        addMessageId(msgId);
-
-        console.log('Bot got message', message);
-        const reply = await send(message.text);
-        // console.log('Reply', reply);
-        return await bot.reply(message, reply);
+        return chat(bot, message);
     });
 
     controller.hears('dm me', 'message', async(bot, message) => {
@@ -54,11 +59,13 @@ module.exports = function(controller) {
     });
 
     controller.on('direct_mention', async(bot, message) => {
-        await bot.reply(message, `I heard a direct mention that said "${ message.text }"`);
+        // await bot.reply(message, `I heard a direct mention that said "${ message.text }"`);
+        return chat(bot, message);
     });
 
     controller.on('mention', async(bot, message) => {
-        await bot.reply(message, `You mentioned me when you said "${ message.text }"`);
+        // await bot.reply(message, `You mentioned me when you said "${ message.text }"`);
+        return chat(bot, message);
     });
 
     controller.hears('ephemeral', 'message,direct_message', async(bot, message) => {
