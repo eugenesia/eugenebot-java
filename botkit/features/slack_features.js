@@ -3,6 +3,25 @@
  * Licensed under the MIT License.
  */
 const { SlackDialog } = require('botbuilder-adapter-slack');
+const { send } = require('../modules/cleverbot')
+
+const msgIds = [];
+const msgIdsMax = 10;
+
+function addMessageId(msgId) {
+    msgIds.push(msgId);
+    // Keep the most recent N items
+    if (msgIds.length > msgIdsMax) {
+        msgIds.shift();
+    }
+}
+
+function isMessageProcessed(msgId) {
+    if (msgIds.indexOf(msgId) !== -1) {
+        return true;
+    }
+    return false;
+}
 
 module.exports = function(controller) {
 
@@ -15,7 +34,18 @@ module.exports = function(controller) {
     });
 
     controller.on('direct_message', async(bot, message) => {
-        await bot.reply(message,'I heard a private message');
+
+        // Slack sends multiple messages per user action, don't handle them twice
+        const msgId = message.client_message_id;
+        if (isMessageProcessed(msgId)) {
+            return;
+        }
+        addMessageId(msgId);
+
+        console.log('Bot got message', message);
+        const reply = await send(message.text);
+        // console.log('Reply', reply);
+        return await bot.reply(message, reply);
     });
 
     controller.hears('dm me', 'message', async(bot, message) => {
