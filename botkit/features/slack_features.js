@@ -3,40 +3,24 @@
  * Licensed under the MIT License.
  */
 const { SlackDialog } = require('botbuilder-adapter-slack');
-const { send } = require('../modules/cleverbot')
+const { send } = require('../modules/cleverbot');
+const { trackMessage, isMessageProcessed, trackAction, lastAction } = require('../modules/slack');
 
-const msgIds = [];
-const msgIdsMax = 10;
-
-function addMessageId(msgId) {
-    msgIds.push(msgId);
-    // Keep the most recent N items
-    if (msgIds.length > msgIdsMax) {
-        msgIds.shift();
-    }
-}
-
-function isMessageProcessed(msgId) {
-    if (msgIds.indexOf(msgId) !== -1) {
-        return true;
-    }
-    return false;
-}
 
 function stripTags(txt) {
-    return txt.replace(/(<([^>]+)>)/ig,"");
+  return txt.replace(/(<([^>]+)>)/ig,"");
 }
 
 async function chat(bot, message) {
-    // Slack sends multiple messages per user action, don't handle them twice
-    const msgId = message.client_msg_id;
-    if (isMessageProcessed(msgId)) {
-        return;
-    }
-    addMessageId(msgId);
+  // Slack sends multiple messages per user action, don't handle them twice
+  const msgId = message.client_msg_id;
+  if (isMessageProcessed(msgId)) {
+    return;
+  }
+  trackMessage(msgId);
 
-    const reply = await send(stripTags(message.text));
-    return await bot.reply(message, reply);
+  const reply = await send(stripTags(message.text));
+  return await bot.reply(message, reply);
 }
 
 module.exports = function(controller) {
