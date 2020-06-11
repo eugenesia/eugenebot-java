@@ -8,7 +8,7 @@ const { trackMessage, isMessageProcessed, trackAction, lastAction } = require('.
 
 // Time from last user interaction to ascertain that user is resuming
 // conversation with bot
-const convoExpireTime = 45000;
+const convoExpireTime = 60000;
 
 function isUserResumingInteraction(userId) {
   const lastInteractTime = lastAction(userId);
