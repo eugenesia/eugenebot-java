@@ -6,23 +6,6 @@ const { SlackDialog } = require('botbuilder-adapter-slack');
 const { send } = require('../modules/cleverbot');
 const { trackMessage, isMessageProcessed, trackAction, lastAction } = require('../modules/slack');
 
-
-function stripTags(txt) {
-  return txt.replace(/(<([^>]+)>)/ig, "");
-}
-
-async function chat(bot, message) {
-  const msgId = message.client_msg_id;
-  // Slack sends multiple messages per user action, don't handle them twice
-  if (isMessageProcessed(msgId)) {
-    return;
-  }
-  trackMessage(msgId);
-
-  const reply = await send(stripTags(message.text));
-  return await bot.reply(message, reply);
-}
-
 module.exports = function (controller) {
 
   controller.ready(async () => {
@@ -214,4 +197,20 @@ module.exports = function (controller) {
   controller.on('dialog_cancellation', async (bot, message) => {
     await bot.reply(message, 'Got a dialog cancellation');
   });
+}
+
+function stripTags(txt) {
+  return txt.replace(/(<([^>]+)>)/ig, "");
+}
+
+async function chat(bot, message) {
+  const msgId = message.client_msg_id;
+  // Slack sends multiple messages per user action, don't handle them twice
+  if (isMessageProcessed(msgId)) {
+    return;
+  }
+  trackMessage(msgId);
+
+  const reply = await send(stripTags(message.text));
+  return await bot.reply(message, reply);
 }
