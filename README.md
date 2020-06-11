@@ -1,22 +1,41 @@
-# eugenebot-java
-A Cleverbot-based Slack bot in Java
+# eugenebot
+A Cleverbot-based Slack bot made with Botkit in Node.js
 
 ## Installation
 
-On Ubuntu, install `firefox-geckodriver`
-Install `cleverbotfree` in pip3
+### Cleverbot connection
 
-Add your Slackbot token in jbot-example's application.properties
+On Ubuntu, install `firefox-geckodriver` required to communicate with the
+Cleverbot server
+```bash
+sudo apt install firefox-geckodriver
+```
+
+Install `cleverbotfree` in pip3
+```bash
+pip3 install cleverbotfree
+```
+
+### Botkit
+
+Install Botkit dependencies
+```bash
+cd botkit
+npm ci # Or npm install
+```
+
+Create _botkit/.env_ from the template file and fill in your Slack secrets.
 
 ## Usage
+
 ```bash
+# Start the Cleverbot communication server
 cd cleverbot
 python3 server.py &
 
-cd ../jbot
-mvn clean install
-cd jbot-example
-mvn spring-boot:run &
+# 
+cd ../botkit
+npm start &
 ```
 
 ## Server usage
@@ -28,8 +47,9 @@ sudo crontab -e
 
 # Paste the following or similar
 
-# Eugenebot Java
-@reboot cd /srv/eugenebot-java/cleverbot; python3 server.py >> /tmp/eugenebot-cleverbot.log 2>&1
+# Cleverbot connection
+@reboot cd /srv/eugenebot/cleverbot; python3 server.py >> /tmp/eugenebot-cleverbot.log 2>&1
 # Wait for Cleverbot to start up and accept connections
-@reboot sleep 30; cd /srv/eugenebot-java/jbot/jbot-example/target; java -jar jbot-example-4.1.2-rc.3-SNAPSHOT.jar >> /tmp/eugenebot-jbot.log 2>&1
+@reboot sleep 30; cd /srv/eugenebot/botkit; npm start >> /tmp/eugenebot-botkit.log 2>&1
 ```
+
