@@ -1,11 +1,11 @@
 const users = {};
 const expireTime = 180000; // Milliseconds after which the user should be forgotten
 
-// How long ago did the user do the action?
+// When did the user do the action?
 function lastAction(userId) {
   if (userId in users) {
     // Return in seconds
-    return Date.now() - users[userId];
+    return users[userId];
   }
   return null; // User never did it, or did it too long ago
 }

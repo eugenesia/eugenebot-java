@@ -23,7 +23,7 @@ client.on('close', function() {
 });
 
 async function send(msg) {
-	console.log('Message received', msg)
+	// console.log('Message received', msg)
 	client.write(msg + '\n');
 	return new Promise((resolve, reject) => {
 

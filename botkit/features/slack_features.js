@@ -6,6 +6,21 @@ const { SlackDialog } = require('botbuilder-adapter-slack');
 const { send } = require('../modules/cleverbot');
 const { trackMessage, isMessageProcessed, trackAction, lastAction } = require('../modules/slack');
 
+// Time from last user interaction to ascertain that user is resuming
+// conversation with bot
+const convoExpireTime = 45000;
+
+function isUserResumingInteraction(userId) {
+  const lastInteractTime = lastAction(userId);
+  // User is still interacting with bot
+  if (lastInteractTime !== null &&
+    Date.now() - lastInteractTime < convoExpireTime) {
+    trackAction(userId); // Store the current interaction time
+    return true;
+  }
+  return false;
+}
+
 module.exports = function (controller) {
 
   controller.ready(async () => {
@@ -17,6 +32,9 @@ module.exports = function (controller) {
   });
 
   controller.on('direct_message', async (bot, message) => {
+    // 1:1 conversation with bot, clearly an interaction
+    // https://botkit.ai/docs/v4/reference/slack.html#slackmessagetypemiddleware
+    trackAction(message.user);
     return chat(bot, message);
   });
 
@@ -27,13 +45,29 @@ module.exports = function (controller) {
 
   controller.on('direct_mention', async (bot, message) => {
     // await bot.reply(message, `I heard a direct mention that said "${ message.text }"`);
+
+    // Message starts with a mention of the bot, clearly an interaction
+    // https://botkit.ai/docs/v4/reference/slack.html#slackmessagetypemiddleware
+    trackAction(message.user);
     return chat(bot, message);
   });
 
   controller.on('mention', async (bot, message) => {
     // await bot.reply(message, `You mentioned me when you said "${ message.text }"`);
+
+    // Mentions Bot so clearly an interaction
+    // https://botkit.ai/docs/v4/reference/slack.html#slackmessagetypemiddleware
+    trackAction(message.user);
     return chat(bot, message);
   });
+
+  // Any message - determine if user is continuing previous interaction
+  controller.on('message', async (bot, message) => {
+    if (isUserResumingInteraction(message.user)) {
+      trackAction(message.user);
+      return chat(bot, message);
+    }
+  })
 
   controller.hears('ephemeral', 'message,direct_message', async (bot, message) => {
     await bot.replyEphemeral(message, 'This is an ephemeral reply sent using bot.replyEphemeral()!');
