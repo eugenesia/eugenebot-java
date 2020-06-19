@@ -241,6 +241,7 @@ module.exports = function (controller) {
 }
 
 function stripTags(txt) {
+  console.log('txt', txt);
   return txt
     .replace(/(<([^>]+)>)/ig, '')
     .replace(/\[\/?URL\]/g, ''); // Mitsuku sends links
@@ -263,5 +264,6 @@ async function chat(bot, message) {
   else {
     reply = await mitsuku.send(stripTags(message.text));
   }
-  return stripTags(await bot.reply(message, reply));
+  reply = stripTags(reply);
+  return await bot.reply(message, reply);
 }
