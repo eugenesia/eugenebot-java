@@ -11,7 +11,7 @@ Cbot server
 sudo apt install firefox-geckodriver
 ```
 
-Install `cleverbotfree` in pip3
+Install cbot in pip3
 ```bash
 pip3 install cleverbotfree
 ```
@@ -30,7 +30,7 @@ Create _botkit/.env_ from the template file and fill in your Slack secrets.
 
 ```bash
 # Start the Cbot communication server
-cd cleverbot
+cd cbot
 python3 server.py &
 
 # 
@@ -48,10 +48,10 @@ sudo crontab -e
 # Paste the following or similar
 
 # Cbotfree breaks often - pull latest fixes
-0 23 * * * pip3 install --upgrade cleverbotfree >> /tmp/cleverbotfree-upgrade.log 2>&1
+0 23 * * * pip3 install --upgrade cleverbotfree >> /tmp/cbotfree-upgrade.log 2>&1
 # Cbot connection
-@reboot cd /srv/eugenebot/cleverbot; python3 server.py >> /tmp/eugenebot-cleverbot.log 2>&1
-# Wait for Cleverbot to start up and accept connections
+@reboot cd /srv/eugenebot/cbot; python3 server.py >> /tmp/eugenebot-cbot.log 2>&1
+# Wait for Cbot to start up and accept connections
 @reboot sleep 30; cd /srv/eugenebot/botkit; npm start >> /tmp/eugenebot-botkit.log 2>&1
 ```
 
