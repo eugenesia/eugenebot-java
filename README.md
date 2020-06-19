@@ -47,6 +47,8 @@ sudo crontab -e
 
 # Paste the following or similar
 
+# Cleverbotfree breaks often - pull latest fixes
+@reboot pip3 install --upgrade cleverbotfree >> /tmp/cleverbotfree-upgrade.log 2>&1
 # Cleverbot connection
 @reboot cd /srv/eugenebot/cleverbot; python3 server.py >> /tmp/eugenebot-cleverbot.log 2>&1
 # Wait for Cleverbot to start up and accept connections
