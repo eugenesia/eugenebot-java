@@ -241,10 +241,11 @@ module.exports = function (controller) {
 }
 
 function stripTags(txt) {
-  console.log('txt', txt);
-  return txt
-    .replace(/(<([^>]+)>)/ig, '')
-    .replace(/\[\/?URL\]/g, ''); // Mitsuku sends links
+  return txt.replace(/(<([^>]+)>)/ig, '');
+}
+
+function stripMarkdownTags(txt) {
+  return txt.replace(/\[\/?URL\]/g, ''); // Mitsuku sends links
 }
 
 async function chat(bot, message) {
@@ -262,8 +263,7 @@ async function chat(bot, message) {
     reply = await cbotSend(stripTags(message.text));
   }
   else {
-    reply = await mitsuku.send(stripTags(message.text));
+    reply = stripMarkdownTags(await mitsuku.send(stripTags(message.text)));
   }
-  reply = stripTags(reply);
   return await bot.reply(message, reply);
 }
