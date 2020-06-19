@@ -12,3 +12,5 @@ CLIENT_SECRET=<my-client-secret>
 VERIFICATION_TOKEN=<my-slack-verification-token>
 REDIRECT_URI=<http(s)://my-domain:my-port/install/auth>
 
+# mitsuku or cleverbot
+BOT_ENGINE=mitsuku
