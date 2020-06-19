@@ -3,8 +3,15 @@
  * Licensed under the MIT License.
  */
 const { SlackDialog } = require('botbuilder-adapter-slack');
-const { send } = require('../modules/cleverbot');
 const { trackMessage, isMessageProcessed, trackAction, lastAction } = require('../modules/slack');
+
+let mitsuku;
+if (process.env.BOT_ENGINE === 'mitsuku') {
+  mitsuku = require('mitsuku-api')();
+}
+else {
+  const { send: cbotSend } = require('../modules/cleverbot');
+}
 
 // Time from last user interaction to ascertain that user is resuming
 // conversation with bot
@@ -234,7 +241,9 @@ module.exports = function (controller) {
 }
 
 function stripTags(txt) {
-  return txt.replace(/(<([^>]+)>)/ig, "");
+  return txt
+    .replace(/(<([^>]+)>)/ig, '')
+    .replace(/\[\/?URL\]/g, ''); // Mitsuku sends links
 }
 
 async function chat(bot, message) {
@@ -245,6 +254,14 @@ async function chat(bot, message) {
   }
   trackMessage(msgId);
 
-  const reply = await send(stripTags(message.text));
-  return await bot.reply(message, reply);
+  console.log('message.text', message.text);
+
+  let reply;
+  if (process.env.BOT_ENGINE === 'cleverbot') {
+    reply = await cbotSend(stripTags(message.text));
+  }
+  else {
+    reply = await mitsuku.send(stripTags(message.text));
+  }
+  return stripTags(await bot.reply(message, reply));
 }
