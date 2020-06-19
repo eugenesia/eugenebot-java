@@ -12,7 +12,7 @@ if (process.env.BOT_ENGINE === 'mitsuku') {
   mitsuku = require('mitsuku-api')();
 }
 else {
-  let { send: cbotSend } = require('../modules/cleverbot');
+  ({ send: cbotSend } = require('../modules/cleverbot'));
 }
 
 // Time from last user interaction to ascertain that user is resuming
@@ -257,8 +257,6 @@ async function chat(bot, message) {
     return;
   }
   trackMessage(msgId);
-
-  console.log('message.text', message.text);
 
   let reply;
   if (process.env.BOT_ENGINE === 'cleverbot') {
