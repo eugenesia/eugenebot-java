@@ -6,11 +6,13 @@ const { SlackDialog } = require('botbuilder-adapter-slack');
 const { trackMessage, isMessageProcessed, trackAction, lastAction } = require('../modules/slack');
 
 let mitsuku;
+let cbotSend;
+
 if (process.env.BOT_ENGINE === 'mitsuku') {
   mitsuku = require('mitsuku-api')();
 }
 else {
-  const { send: cbotSend } = require('../modules/cleverbot');
+  let { send: cbotSend } = require('../modules/cleverbot');
 }
 
 // Time from last user interaction to ascertain that user is resuming
